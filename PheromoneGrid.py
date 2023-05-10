@@ -2,6 +2,7 @@ import numpy as np
 
 import Random
 from EnvironmentData import EnvironmentData
+from Pheromone import Pheromone
 
 
 class PheromoneGrid:
@@ -17,49 +18,27 @@ class PheromoneGrid:
             x = int(Random.get_random_float() * width)
             y = int(Random.get_random_float() * height)
 
-            self.__grid[x,y].deactivate()
-            self.__grid[x,y].level = self.__env_data.natural_pheromones_strength
+            self.__grid[x, y].deactivate()
+            self.__grid[x, y].level = self.__env_data.natural_pheromones_strength
 
+    diffuse_vectorized = np.vectorize(lambda p: p.diffuse)
+
+    # TODO: Does this realy work???
     def update(self) -> None:
-        self.__grid.ma
-        for (std.vector < Pheromone * > & line: * grid) :
-            for (Pheromone * pheromone: line) :
-                pheromone.diffuse()
+        self.diffuse_vectorized(self.__grid)
 
-    void
-    PheromoneGrid.addSlimeLevel(int
-    x, int
-    y) {
-        grid.at(y).at(x).addSlimeLevel()
-    }
+    def add_slime_level(self, x: int, y: int) -> None:
+        self.__grid[x, y].addSlimeLevel()
 
-    void
-    PheromoneGrid.setSlimeId(int
-    x, int
-    y, long
-    id) {
-        grid.at(y).at(x).slimeId = id
-    }
+    def set_slime_id(self, x: int, y: int, p_id: int) -> None:
+        self.__grid[y, x].set_slime_id(p_id)
 
-    std.vector < std.vector < Pheromone * >>
-    *PheromoneGrid.getGrid()
-    {
-    return grid
-    }
+    def get_grid(self) -> np.ndarray:
+        return self.__grid
 
-    void
-    PheromoneGrid.updateSize()
-    {
-    grid = new
-    std.vector < std.vector < Pheromone * >> ()
+    def update_size(self) -> None:
+        self.__grid = np.ndarray((self.__env_data.grid_width, self.__env_data.grid_width), Pheromone)
 
-    for (int y = 0 y < envData.grid_height y++) {
-        std.vector < Pheromone * > v = std.vector < Pheromone * > ()
-
-    for (int x = 0 x < envData.grid_width x++) {
-    v.push_back(new Pheromone(envData))
-    }
-    grid.push_back(v)
-    }
-
-}
+        for x in range(self.__env_data.grid_width):
+            for y in range(self.__env_data.grid_height):
+                self.__grid[x, y](Pheromone(self.__env_data))

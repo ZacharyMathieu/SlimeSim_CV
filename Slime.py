@@ -4,6 +4,7 @@ import math
 import Random
 from EnvironmentData import EnvironmentData
 from SlimeVector import SlimeVector
+from PheromoneGrid import PheromoneGrid
 
 
 class Slime:
@@ -48,7 +49,7 @@ class Slime:
         self.__y = Random.get_random_float() * (self.__env_data.grid_height - 1)
         self.__angle = Random.get_random_float() * (2 * math.pi)
 
-    def moveForward(self, grid: PheromoneGrid, slimes: SlimeVector, seek_pheromones: bool):
+    def move_forward(self, grid: PheromoneGrid, slimes: SlimeVector, seek_pheromones: bool):
         x_speed = self.__env_data.slime_speed * math.cos(self.__angle)
         y_speed = self.__env_data.slime_speed * math.sin(self.__angle)
 
@@ -80,42 +81,40 @@ class Slime:
         if self.__env_data.slime_avoid_walls:
             self.avoid_walls(x_speed, y_speed)
 
-        decisionDone = False
-
         if self.__env_data.slime_seek_pheromones:
             if seek_pheromones:
-                decisionDone = self.seek_pheromones(grid)
+                self.seek_pheromones(grid)
 
         if self.__env_data.slime_align_direction:
-            decisionDone = self.align_direction_with_nearby_slime(slimes)
+            self.align_direction_with_nearby_slime(slimes)
 
         if self.__env_data.slime_bias_direction:
             self.turn_torwards(self.__env_data.slime_bias_direction_x, self.__env_data.slime_bias_direction_y,
                                self.__env_data.slime_bias_rotation_angle)
 
-    def avoid_walls(self, xSpeed: float, ySpeed: float) -> bool:
+    def avoid_walls(self, x_speed: float, y_speed: float) -> bool:
         made_turn = False
         if self.__x < self.__env_data.slime_wall_detection_range:
             made_turn = True
-            if ySpeed >= 0:
+            if y_speed >= 0:
                 self.turn(False, -self.__env_data.slime_wall_turn_angle)
             else:
                 self.turn(False, self.__env_data.slime_wall_turn_angle)
         elif self.__x > self.__env_data.grid_width - self.__env_data.slime_wall_detection_range:
             made_turn = True
-            if ySpeed >= 0:
+            if y_speed >= 0:
                 self.turn(False, self.__env_data.slime_wall_turn_angle)
             else:
                 self.turn(False, -self.__env_data.slime_wall_turn_angle)
         elif self.__y < self.__env_data.slime_wall_detection_range:
             made_turn = True
-            if xSpeed >= 0:
+            if x_speed >= 0:
                 self.turn(False, self.__env_data.slime_wall_turn_angle)
             else:
                 self.turn(False, -self.__env_data.slime_wall_turn_angle)
         elif self.__y > self.__env_data.grid_height - self.__env_data.slime_wall_detection_range:
             made_turn = True
-            if xSpeed >= 0:
+            if x_speed >= 0:
                 self.turn(False, -self.__env_data.slime_wall_turn_angle)
             else:
                 self.turn(False, self.__env_data.slime_wall_turn_angle)
@@ -254,6 +253,6 @@ class Slime:
             spacing + " self.__x: " + self.__x.__str__() + "\n" + \
             spacing + " self.__y: " + self.__y.__str__() + "\n" + \
             spacing + " self.__angle: " + self.__angle.__str__() + "\n" + \
-            spacing + " Speed: " + self.__env_data.slime_speed + "\n"
+            spacing + " Speed: " + self.__env_data.slime_speed.__str__() + "\n"
 
         return s

@@ -71,3 +71,5 @@ SLIME_BIAS_ROTATION_ANGLE = 0.01
 # Parameters settings
 PARAMETER_FILE_NAME = "parameters.txt"
 PARAMETER_DELIMITER = ' '
+PARAMETER_TRUE_VALUES = ["true", "True", "t", "T", "1"]
+PARAMETER_FALSE_VALUES = ["false", "False", "f", "F", "0"]
