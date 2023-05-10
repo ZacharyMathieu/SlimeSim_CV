@@ -11,6 +11,7 @@ class Pheromone:
 
     def __init__(self, data: EnvironmentData):
         self.__env_data = data
+        self.__slime_id = None
 
     def add_slime_level(self) -> None:
         if self.__active:
@@ -43,3 +44,12 @@ class Pheromone:
 
     def deactivate(self) -> None:
         self.__active = False
+
+    def get_level(self) -> float:
+        return self.__level
+
+    def get_slime_id(self) -> int:
+        return self.__slime_id
+
+    def set_slime_id(self, p_id: int) -> None:
+        self.__slime_id = p_id

@@ -5,6 +5,11 @@ from EnvironmentData import EnvironmentData
 from Pheromone import Pheromone
 
 
+def d(p: Pheromone) -> None:
+    if p is not None:
+        p.diffuse()
+
+
 class PheromoneGrid:
     __env_data: EnvironmentData
     __grid: np.ndarray
@@ -21,17 +26,17 @@ class PheromoneGrid:
             self.__grid[x, y].deactivate()
             self.__grid[x, y].level = self.__env_data.natural_pheromones_strength
 
-    diffuse_vectorized = np.vectorize(lambda p: p.diffuse)
+    diffuse_vectorized = np.vectorize(d)
 
     # TODO: Does this realy work???
     def update(self) -> None:
         self.diffuse_vectorized(self.__grid)
 
     def add_slime_level(self, x: int, y: int) -> None:
-        self.__grid[x, y].addSlimeLevel()
+        self.__grid[x, y].add_slime_level()
 
     def set_slime_id(self, x: int, y: int, p_id: int) -> None:
-        self.__grid[y, x].set_slime_id(p_id)
+        self.__grid[x, y].set_slime_id(p_id)
 
     def get_grid(self) -> np.ndarray:
         return self.__grid
@@ -41,4 +46,4 @@ class PheromoneGrid:
 
         for x in range(self.__env_data.grid_width):
             for y in range(self.__env_data.grid_height):
-                self.__grid[x, y](Pheromone(self.__env_data))
+                self.__grid[x, y] = Pheromone(self.__env_data)

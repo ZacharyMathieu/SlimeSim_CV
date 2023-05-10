@@ -1,4 +1,5 @@
-from SlimeVector import SlimeVector
+import numpy as np
+
 from EnvironmentData import EnvironmentData
 from PheromoneGrid import PheromoneGrid
 from Slime import Slime
@@ -8,14 +9,14 @@ import Constants
 
 
 class Environment:
-    __slime_vector: SlimeVector
+    __slime_vector: np.ndarray
     __env_data: EnvironmentData
-    __pheromone_grid: PheromoneGrid
+    __pheromone_grid: PheromoneGrid = None
     __seek_pheromone_timer = 0
 
     def __init__(self):
-        self.__slime_vector = SlimeVector()
         self.__env_data = EnvironmentData()
+        self.update_parameters()
         self.__pheromone_grid = PheromoneGrid(self.__env_data.grid_width,
                                               self.__env_data.grid_height,
                                               self.__env_data)
@@ -30,7 +31,7 @@ class Environment:
     def get_slime_count(self) -> int:
         return len(self.__slime_vector)
 
-    def get_slime_vector(self) -> SlimeVector:
+    def get_slime_vector(self) -> np.ndarray:
         return self.__slime_vector
 
     def get_pheromone_grid(self) -> PheromoneGrid:
@@ -60,8 +61,9 @@ class Environment:
         self.update_pheromones()
 
     def generate_random_slime(self, slime_count: int) -> None:
+        self.__slime_vector = np.ndarray(slime_count, Slime)
         for i in range(slime_count):
-            self.__slime_vector.append(Slime.generate_random(i, self.__env_data))
+            self.__slime_vector[i] = Slime.generate_random(i, self.__env_data)
 
     def get_info_string(self, spacing_count: int) -> str:
         spacing = " " * spacing_count
@@ -107,12 +109,14 @@ class Environment:
             if self.__env_data.grid_width != param.value_number:
                 print("grid_width set to : [" + param.value_number.__str__() + "]\n")
                 self.__env_data.grid_width = int(param.value_number)
-                self.__pheromone_grid.update_size()
+                if self.__pheromone_grid is not None:
+                    self.__pheromone_grid.update_size()
         elif param.name == "grid_height":
             if self.__env_data.grid_height != param.value_number:
                 print("grid_height set to : [" + param.value_number.__str__() + "]\n")
                 self.__env_data.grid_height = int(param.value_number)
-                self.__pheromone_grid.update_size()
+                if self.__pheromone_grid is not None:
+                    self.__pheromone_grid.update_size()
         elif param.name == "loop_grid":
             if self.__env_data.loop_grid != param.value_bool:
                 print("loop_grid set to : [" + param.value_bool.__str__() + "]\n")

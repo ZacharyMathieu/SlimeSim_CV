@@ -23,17 +23,18 @@ class ParameterReader:
                 if len(out) >= 2:
                     param = InputParam()
                     param.name = out[0]
+                    value = out[1].replace("\n", "")
                     try:
-                        float_value = float(out[1])
+                        float_value = float(value)
                         param.value_number = float_value
                     except ValueError:
-                        bool_value = True if out[1].lower() in Constants.PARAMETER_TRUE_VALUES \
-                            else False if out[1].lower() in Constants.PARAMETER_FALSE_VALUES \
+                        bool_value = True if value.lower() in Constants.PARAMETER_TRUE_VALUES \
+                            else False if value.lower() in Constants.PARAMETER_FALSE_VALUES \
                             else None
                         if bool_value is not None:
                             param.value_bool = bool_value
                         else:
-                            param.value_string = out[1]
+                            param.value_string = value
 
                     p_list.append(param)
 

@@ -10,7 +10,7 @@ grid_height 200
 loop_grid true
 random_natural_pheromones_count 0
 natural_pheromones_strength 1000
-slime_count 10000
+slime_count 2
 slime_avoid_walls true
 slime_wall_detection_range 25
 slime_wall_turn_angle 0.5

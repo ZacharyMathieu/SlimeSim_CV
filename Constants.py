@@ -1,6 +1,7 @@
 # Window settings
 WINDOW_WIDTH = 1600
 WINDOW_HEIGHT = 800
+CANVAS_REFRESH_PERIOD_MS = 50
 
 # Display settings
 DISPLAY_PHEROMONES = True
@@ -73,3 +74,4 @@ PARAMETER_FILE_NAME = "parameters.txt"
 PARAMETER_DELIMITER = ' '
 PARAMETER_TRUE_VALUES = ["true", "True", "t", "T", "1"]
 PARAMETER_FALSE_VALUES = ["false", "False", "f", "F", "0"]
+PARAMETER_UPDATE_PERIOD_MS = 250

@@ -1,10 +1,11 @@
 from __future__ import annotations
 import math
+import numpy as np
 
 import Random
 from EnvironmentData import EnvironmentData
-from SlimeVector import SlimeVector
 from PheromoneGrid import PheromoneGrid
+from Pheromone import Pheromone
 
 
 class Slime:
@@ -49,7 +50,7 @@ class Slime:
         self.__y = Random.get_random_float() * (self.__env_data.grid_height - 1)
         self.__angle = Random.get_random_float() * (2 * math.pi)
 
-    def move_forward(self, grid: PheromoneGrid, slimes: SlimeVector, seek_pheromones: bool):
+    def move_forward(self, grid: PheromoneGrid, slimes: np.ndarray, seek_pheromones: bool):
         x_speed = self.__env_data.slime_speed * math.cos(self.__angle)
         y_speed = self.__env_data.slime_speed * math.sin(self.__angle)
 
@@ -147,18 +148,18 @@ class Slime:
         strongest_pheromone = 0
         for i_y in range(min_y, max_y):
             for i_x in range(min_x, max_x):
-                pheromone = grid[i_x, i_y]
-                if pheromone.level >= strongest_pheromone:
-                    if (not self.__env_data.slime_ignore_self_pheromone) or (pheromone.slimeId != self.__id):
-                        if pheromone_found and (pheromone.level == strongest_pheromone):
-                            new_distance = math.sqrt(pow(i_x - self.__x, 2) + pow(i_y - self.__y, 2))
+                pheromone: Pheromone = grid[i_x, i_y]
+                if pheromone.get_level() >= strongest_pheromone:
+                    if (not self.__env_data.slime_ignore_self_pheromone) or (pheromone.get_slime_id() != self.__id):
+                        if pheromone_found and (pheromone.get_level() == strongest_pheromone):
+                            new_distance = math.sqrt((i_x - self.__x) ** 2 + (i_y - self.__y) ** 2)
 
                             if strongest_pheromone_distance < new_distance:
                                 strongest_pheromone_pos = (i_x, i_y)
                                 strongest_pheromone_distance = new_distance
                         else:
                             pheromone_found = True
-                            strongest_pheromone = pheromone.level
+                            strongest_pheromone = pheromone.get_level()
                             strongest_pheromone_pos = (i_x, i_y)
                             strongest_pheromone_distance = math.sqrt(
                                 pow(strongest_pheromone_pos[0] - self.__x, 2) +
@@ -212,7 +213,7 @@ class Slime:
         centered_x = target_x - floor_x
         centered_y = target_y - floor_y
 
-        target_angle = math.atan(centered_y / centered_x)
+        target_angle = math.atan2(centered_y, centered_x)
 
         if centered_x < 0:
             target_angle += math.pi
@@ -222,21 +223,21 @@ class Slime:
 
         self.turn_to_angle(True, target_angle, max_angle)
 
-    def align_direction_with_nearby_slime(self, slimes: SlimeVector) -> bool:
+    def align_direction_with_nearby_slime(self, slimes: np.ndarray) -> bool:
         slime_found = False
 
         for slime in slimes:
             d_x = abs(self.__x - slime.get_x())
             d_y = abs(self.__y - slime.get_y())
 
-            if (d_x < self.__env_data.slime_other_detection_range) and (
-                    d_y < self.__env_data.slime_other_detection_range):
-                if slime != self:
-                    if math.sqrt((d_x * d_x) + (d_y * d_y)) <= self.__env_data.slime_other_detection_range:
-                        slime_found = True
-                        self.__last_slime_aligned = slime
-                        self.align_direction_with_slime(slime)
-                        break
+            if slime != self \
+                    and (d_x < self.__env_data.slime_other_detection_range) \
+                    and (d_y < self.__env_data.slime_other_detection_range) \
+                    and (math.sqrt((d_x ** 2) + (d_y ** 2)) <= self.__env_data.slime_other_detection_range):
+                slime_found = True
+                self.__last_slime_aligned = slime
+                self.align_direction_with_slime(slime)
+                break
 
         if not slime_found:
             self.__last_slime_aligned = None
