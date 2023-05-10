@@ -1,13 +1,10 @@
 import numpy as np
+from collections.abc import Iterator
 
 import Random
 from EnvironmentData import EnvironmentData
 from Pheromone import Pheromone
-
-
-def d(p: Pheromone) -> None:
-    if p is not None:
-        p.diffuse()
+import Optim
 
 
 class PheromoneGrid:
@@ -26,11 +23,20 @@ class PheromoneGrid:
             self.__grid[x, y].deactivate()
             self.__grid[x, y].level = self.__env_data.natural_pheromones_strength
 
-    diffuse_vectorized = np.vectorize(d)
+    def __getitem__(self, pos: tuple[int, int]) -> Pheromone:
+        return self.__grid[pos]
 
-    # TODO: Does this realy work???
+    def __iter__(self) -> Iterator[Pheromone]:
+        return self.__grid.__iter__()
+
     def update(self) -> None:
-        self.diffuse_vectorized(self.__grid)
+        for p_a in self.__grid:
+            for p in p_a:
+                if p.get_active() and p.get_level() > 0:
+                    p.diffuse()
+                    # Optim.bank_exec("Diffuse", p.diffuse)
+        # print(Optim.time_bank)
+        # Optim.reset_bank()
 
     def add_slime_level(self, x: int, y: int) -> None:
         self.__grid[x, y].add_slime_level()
@@ -42,8 +48,8 @@ class PheromoneGrid:
         return self.__grid
 
     def update_size(self) -> None:
-        self.__grid = np.ndarray((self.__env_data.grid_width, self.__env_data.grid_width), Pheromone)
+        self.__grid = np.ndarray((self.__env_data.grid_width, self.__env_data.grid_height), Pheromone)
 
         for x in range(self.__env_data.grid_width):
             for y in range(self.__env_data.grid_height):
-                self.__grid[x, y] = Pheromone(self.__env_data)
+                self.__grid[x, y] = Pheromone(self.__env_data, x, y)

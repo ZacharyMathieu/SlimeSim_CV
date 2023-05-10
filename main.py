@@ -1,6 +1,5 @@
-from Environment import Environment
 from Controller import Controller
 
-environment = Environment()
-controller = Controller(environment)
+controller = Controller()
+controller.start_parameter_update_thread()
 controller.start_animate_loop()

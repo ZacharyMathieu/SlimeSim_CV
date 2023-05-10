@@ -1,22 +1,29 @@
 # Window settings
 WINDOW_WIDTH = 1600
 WINDOW_HEIGHT = 800
-CANVAS_REFRESH_PERIOD_MS = 50
+CANVAS_SCALE = 2
+WINDOW_COLOR_CHANNELS = 4
+CANVAS_REFRESH_PERIOD_MS = 0
 
 # Display settings
 DISPLAY_PHEROMONES = True
 DISPLAY_SLIME = True
 DISPLAY_SLIME_SIZE = 1
-DISPLAY_SLIME_OPACITY = 75
-DISPLAY_SLIME_COLOR = {255, 255, 0, DISPLAY_SLIME_OPACITY}
-DISPLAY_HIGHLIGHT_PHEROMONE_COLOR = {0, 255, 0, 255}
-DISPLAY_INACTIVE_PHEROMONE_COLOR = {255, 0, 255, 255}
+DISPLAY_SLIME_OPACITY = 0.25
+DISPLAY_SLIME_COLOR = [0, 1, 1, DISPLAY_SLIME_OPACITY]
+DISPLAY_HIGHLIGHT_PHEROMONE_COLOR = [0, 1, 0, 1]
+DISPLAY_INACTIVE_PHEROMONE_COLOR = [1, 0, 1, 1]
 
 
-def DISPLAY_DEFAULT_PHEROMONE_COLOR(level): return 0, min((1 - level) * 2, 1.0) * level * 255, level * 255
+def DISPLAY_DEFAULT_PHEROMONE_COLOR(level) -> tuple[int, int, int, int]:
+    return level, \
+           min((1 - level) * 2, 1.0) * level, \
+           0, \
+           1
 
 
-def COLOR_FROM_ARRAY(t): return t[0], t[1], t[2], t[3]
+def COLOR_FROM_ARRAY(t) -> tuple[int, int, int, int]:
+    return t[0], t[1], t[2], t[3]
 
 
 # Grid settings
@@ -74,4 +81,4 @@ PARAMETER_FILE_NAME = "parameters.txt"
 PARAMETER_DELIMITER = ' '
 PARAMETER_TRUE_VALUES = ["true", "True", "t", "T", "1"]
 PARAMETER_FALSE_VALUES = ["false", "False", "f", "F", "0"]
-PARAMETER_UPDATE_PERIOD_MS = 250
+PARAMETER_UPDATE_PERIOD_MS = 500

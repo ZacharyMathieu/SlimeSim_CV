@@ -6,6 +6,7 @@ from Slime import Slime
 from InputParam import InputParam
 from ParameterReader import ParameterReader
 import Constants
+import Optim
 
 
 class Environment:
@@ -27,6 +28,9 @@ class Environment:
 
     def get_height(self) -> int:
         return self.__env_data.grid_height
+
+    def get_env_data(self) -> EnvironmentData:
+        return self.__env_data
 
     def get_slime_count(self) -> int:
         return len(self.__slime_vector)
@@ -50,15 +54,17 @@ class Environment:
             slime.move_forward(self.__pheromone_grid, self.__slime_vector, seek_pheromones)
 
     def update_pheromones(self) -> None:
-        for slime in self.__slime_vector:
-            self.__pheromone_grid.add_slime_level(int(slime.get_x()), int(slime.get_y()))
-            self.__pheromone_grid.set_slime_id(int(slime.get_x()), int(slime.get_y()), slime.get_id())
+        def slime_level_f():
+            for slime in self.__slime_vector:
+                self.__pheromone_grid.add_slime_level(int(slime.get_x()), int(slime.get_y()))
+                self.__pheromone_grid.set_slime_id(int(slime.get_x()), int(slime.get_y()), slime.get_id())
 
-        self.__pheromone_grid.update()
+        Optim.time_exec("Slime level", slime_level_f)
+        Optim.time_exec("Update grid", self.__pheromone_grid.update)
 
     def physics(self) -> None:
-        self.move_all_slime()
-        self.update_pheromones()
+        Optim.time_exec("Move slimes", self.move_all_slime)
+        Optim.time_exec("Update pheromones", self.update_pheromones)
 
     def generate_random_slime(self, slime_count: int) -> None:
         self.__slime_vector = np.ndarray(slime_count, Slime)

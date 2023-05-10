@@ -93,32 +93,38 @@ class Slime:
             self.turn_torwards(self.__env_data.slime_bias_direction_x, self.__env_data.slime_bias_direction_y,
                                self.__env_data.slime_bias_rotation_angle)
 
+        if Random.get_random_bool(self.__env_data.slime_random_rotation_chance):
+            if Random.get_random_bool(0.5):
+                self.turn(self.__env_data.slime_random_rotation_chance)
+            else:
+                self.turn(-self.__env_data.slime_random_rotation_chance)
+
     def avoid_walls(self, x_speed: float, y_speed: float) -> bool:
         made_turn = False
         if self.__x < self.__env_data.slime_wall_detection_range:
             made_turn = True
             if y_speed >= 0:
-                self.turn(False, -self.__env_data.slime_wall_turn_angle)
+                self.turn(-self.__env_data.slime_wall_turn_angle)
             else:
-                self.turn(False, self.__env_data.slime_wall_turn_angle)
+                self.turn(self.__env_data.slime_wall_turn_angle)
         elif self.__x > self.__env_data.grid_width - self.__env_data.slime_wall_detection_range:
             made_turn = True
             if y_speed >= 0:
-                self.turn(False, self.__env_data.slime_wall_turn_angle)
+                self.turn(self.__env_data.slime_wall_turn_angle)
             else:
-                self.turn(False, -self.__env_data.slime_wall_turn_angle)
+                self.turn(-self.__env_data.slime_wall_turn_angle)
         elif self.__y < self.__env_data.slime_wall_detection_range:
             made_turn = True
             if x_speed >= 0:
-                self.turn(False, self.__env_data.slime_wall_turn_angle)
+                self.turn(self.__env_data.slime_wall_turn_angle)
             else:
-                self.turn(False, -self.__env_data.slime_wall_turn_angle)
+                self.turn(-self.__env_data.slime_wall_turn_angle)
         elif self.__y > self.__env_data.grid_height - self.__env_data.slime_wall_detection_range:
             made_turn = True
             if x_speed >= 0:
-                self.turn(False, -self.__env_data.slime_wall_turn_angle)
+                self.turn(-self.__env_data.slime_wall_turn_angle)
             else:
-                self.turn(False, self.__env_data.slime_wall_turn_angle)
+                self.turn(self.__env_data.slime_wall_turn_angle)
 
         return made_turn
 
@@ -168,27 +174,21 @@ class Slime:
             if pheromone_found and strongest_pheromone == self.__env_data.pheromone_max_level:
                 break
 
-            if pheromone_found:
-                self.turn_torwards(strongest_pheromone_pos[0], strongest_pheromone_pos[1],
-                                   self.__env_data.slime_pheromone_turn_angle)
+        if pheromone_found:
+            self.turn_torwards(strongest_pheromone_pos[0], strongest_pheromone_pos[1],
+                               self.__env_data.slime_pheromone_turn_angle)
 
         return pheromone_found
 
-    def turn(self, can_be_random: bool, turn_angle: float) -> None:
-        if can_be_random and Random.get_random_bool(self.__env_data.slime_random_rotation_chance):
-            if Random.get_random_bool(0.5):
-                self.__angle += self.__env_data.slime_random_rotation_chance
-            else:
-                self.__angle -= self.__env_data.slime_random_rotation_chance
-        else:
-            self.__angle += turn_angle
+    def turn(self, turn_angle: float) -> None:
+        self.__angle += turn_angle
 
         if 2 * math.pi < self.__angle:
             self.__angle -= 2 * math.pi
         elif self.__angle < 0:
             self.__angle += 2 * math.pi
 
-    def turn_to_angle(self, can_be_random: bool, target_angle: float, max_turn_angle: float) -> None:
+    def turn_to_angle(self, target_angle: float, max_turn_angle: float) -> None:
         if target_angle < self.__angle:
             target_angle += 2 * math.pi
 
@@ -204,7 +204,7 @@ class Slime:
         else:
             turn_angle = -turn_angle
 
-        self.turn(can_be_random, turn_angle)
+        self.turn(turn_angle)
 
     def turn_torwards(self, target_x: int, target_y: int, max_angle: float) -> None:
         floor_x = math.floor(self.__x)
@@ -215,13 +215,10 @@ class Slime:
 
         target_angle = math.atan2(centered_y, centered_x)
 
-        if centered_x < 0:
-            target_angle += math.pi
-
         if target_angle < 0:
             target_angle += 2 * math.pi
 
-        self.turn_to_angle(True, target_angle, max_angle)
+        self.turn_to_angle(target_angle, max_angle)
 
     def align_direction_with_nearby_slime(self, slimes: np.ndarray) -> bool:
         slime_found = False
@@ -245,7 +242,7 @@ class Slime:
         return slime_found
 
     def align_direction_with_slime(self, slime: Slime) -> None:
-        self.turn_to_angle(True, slime.get_angle(), self.__env_data.slime_align_turn_angle)
+        self.turn_to_angle(slime.get_angle(), self.__env_data.slime_align_turn_angle)
 
     def get_info_string(self, spacing_count: int) -> str:
         spacing = " " * spacing_count

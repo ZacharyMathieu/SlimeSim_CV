@@ -6,6 +6,7 @@ import cv2
 from Environment import Environment
 from EnvironmentDisplay import EnvironmentDisplay
 import Constants
+import Optim
 
 
 class Controller:
@@ -13,20 +14,39 @@ class Controller:
     __canvas: np.ndarray
     __animate_loop_active: bool = False
     __parameters_loop_active: bool = False
+    __wait_for_animate = False
+    __waiting_for_animate = False
 
-    def __init__(self, environment: Environment, canvas: np.ndarray = None):
-        self.__environment = environment
+    def __init__(self, canvas: np.ndarray = None):
+        self.__environment = Environment()
         if canvas is not None:
             self.__canvas = canvas
         else:
-            self.__canvas = np.zeros((self.__environment.get_width(), self.__environment.get_height(), 3))
+            self.__canvas = np.zeros(
+                (self.__environment.get_height(), self.__environment.get_width(), Constants.WINDOW_COLOR_CHANNELS))
 
     def physics(self) -> None:
         self.__environment.physics()
 
     def animate(self) -> bool:
-        self.physics()
-        return EnvironmentDisplay.displayEnvironment(self.__environment, self.__canvas)
+        def wait_f():
+            self.__waiting_for_animate = self.__wait_for_animate
+            while self.__wait_for_animate:
+                time.sleep(0)
+            self.__waiting_for_animate = self.__wait_for_animate
+
+        def physics_f():
+            self.physics()
+
+        def display_f():
+            return EnvironmentDisplay.display_environment(self.__environment, self.__canvas)
+
+        # print()
+        Optim.time_exec("Wait", wait_f)
+        Optim.time_exec("Physics", physics_f)
+        ret = Optim.time_exec("Display", display_f)
+        return ret
+        # return True
 
     def animate_loop(self) -> None:
         while self.__animate_loop_active:
@@ -45,7 +65,18 @@ class Controller:
         self.__animate_loop_active = False
 
     def update_parameters(self) -> None:
+        self.__wait_for_animate = True
+        while not self.__waiting_for_animate:
+            time.sleep(0.1)
+
         self.__environment.update_parameters()
+        shape_env = (self.__environment.get_height(), self.__environment.get_width(), Constants.WINDOW_COLOR_CHANNELS)
+        shape_canvas = self.__canvas.shape
+        if shape_env != shape_canvas:
+            self.__canvas = np.zeros(
+                (self.__environment.get_height(), self.__environment.get_width(), Constants.WINDOW_COLOR_CHANNELS))
+
+        self.__wait_for_animate = False
 
     def parameters_loop(self) -> None:
         while self.__parameters_loop_active:

@@ -1,5 +1,6 @@
 from EnvironmentData import EnvironmentData
 import Constants
+import Optim
 
 
 class Pheromone:
@@ -8,10 +9,14 @@ class Pheromone:
     __need_highlight: bool = False
     __slime_id: int
     __env_data: EnvironmentData
+    __x: int
+    __y: int
 
-    def __init__(self, data: EnvironmentData):
+    def __init__(self, data: EnvironmentData, x: int, y: int):
         self.__env_data = data
         self.__slime_id = None
+        self.__x = x
+        self.__y = y
 
     def add_slime_level(self) -> None:
         if self.__active:
@@ -20,18 +25,21 @@ class Pheromone:
                 self.__level = self.__env_data.pheromone_max_level
 
     def diffuse(self) -> None:
-        if self.__active and self.__level > 0:
-            if self.__env_data.pheromone_max_level < self.__level:
-                self.__level = Constants.PHEROMONE_MAX_LEVEL_RESET_VALUE
+        if self.__env_data.pheromone_max_level < self.__level:
+            self.__level = Constants.PHEROMONE_MAX_LEVEL_RESET_VALUE
 
-            self.__level -= self.__env_data.pheromone_low_level_diffusion_multiplier * (
-                    (1 / (self.__level + 1)) - (1 / (self.__env_data.pheromone_low_level_diffusion_multiplier + 1)))
-            self.__level -= (self.__env_data.pheromone_high_level_diffusion_multiplier * (
-                    self.__level / self.__env_data.pheromone_max_level)) / self.__env_data.pheromone_max_level
-            self.__level -= self.__env_data.pheromone_diffusion_constant
+        # self.__level -= self.__env_data.pheromone_low_level_diffusion_multiplier * (
+        #         (1 / (self.__level + 1)) - (1 / (self.__env_data.pheromone_low_level_diffusion_multiplier + 1)))
+        self.__level -= (self.__env_data.pheromone_low_level_diffusion_multiplier *
+                         (1 - (self.__level / self.__env_data.pheromone_max_level)))
 
-            if self.__level < 0:
-                self.__level = 0
+        self.__level -= (self.__env_data.pheromone_high_level_diffusion_multiplier *
+                         (self.__level / self.__env_data.pheromone_max_level))
+
+        self.__level -= self.__env_data.pheromone_diffusion_constant
+
+        if self.__level < 0:
+            self.__level = 0
 
     def highlight(self) -> None:
         self.__need_highlight = True
@@ -53,3 +61,12 @@ class Pheromone:
 
     def set_slime_id(self, p_id: int) -> None:
         self.__slime_id = p_id
+
+    def get_active(self) -> bool:
+        return self.__active
+
+    def get_x(self) -> int:
+        return self.__x
+
+    def get_y(self) -> int:
+        return self.__y
