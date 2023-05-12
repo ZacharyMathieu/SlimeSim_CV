@@ -29,24 +29,14 @@ class Controller:
         self.__environment.physics()
 
     def animate(self) -> bool:
-        def wait_f():
-            self.__waiting_for_animate = self.__wait_for_animate
-            while self.__wait_for_animate:
-                time.sleep(0)
-            self.__waiting_for_animate = self.__wait_for_animate
+        self.__waiting_for_animate = self.__wait_for_animate
+        while self.__wait_for_animate:
+            time.sleep(0)
+        self.__waiting_for_animate = self.__wait_for_animate
 
-        def physics_f():
-            self.physics()
+        self.physics()
 
-        def display_f():
-            return EnvironmentDisplay.display_environment(self.__environment, self.__canvas)
-
-        # print()
-        Optim.time_exec("Wait", wait_f)
-        Optim.time_exec("Physics", physics_f)
-        ret = Optim.time_exec("Display", display_f)
-        return ret
-        # return True
+        return EnvironmentDisplay.display_environment(self.__environment, self.__canvas)
 
     def animate_loop(self) -> None:
         while self.__animate_loop_active:
@@ -56,6 +46,7 @@ class Controller:
                 self.__animate_loop_active = False
                 self.__parameters_loop_active = False
                 cv2.destroyAllWindows()
+            # print("frame")
 
     def start_animate_loop(self) -> None:
         self.__animate_loop_active = True

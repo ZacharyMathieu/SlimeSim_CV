@@ -28,8 +28,6 @@ class Pheromone:
         if self.__env_data.pheromone_max_level < self.__level:
             self.__level = Constants.PHEROMONE_MAX_LEVEL_RESET_VALUE
 
-        # self.__level -= self.__env_data.pheromone_low_level_diffusion_multiplier * (
-        #         (1 / (self.__level + 1)) - (1 / (self.__env_data.pheromone_low_level_diffusion_multiplier + 1)))
         self.__level -= (self.__env_data.pheromone_low_level_diffusion_multiplier *
                          (1 - (self.__level / self.__env_data.pheromone_max_level)))
 

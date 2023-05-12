@@ -34,9 +34,6 @@ class PheromoneGrid:
             for p in p_a:
                 if p.get_active() and p.get_level() > 0:
                     p.diffuse()
-                    # Optim.bank_exec("Diffuse", p.diffuse)
-        # print(Optim.time_bank)
-        # Optim.reset_bank()
 
     def add_slime_level(self, x: int, y: int) -> None:
         self.__grid[x, y].add_slime_level()

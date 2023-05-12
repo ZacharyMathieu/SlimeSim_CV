@@ -54,17 +54,15 @@ class Environment:
             slime.move_forward(self.__pheromone_grid, self.__slime_vector, seek_pheromones)
 
     def update_pheromones(self) -> None:
-        def slime_level_f():
-            for slime in self.__slime_vector:
-                self.__pheromone_grid.add_slime_level(int(slime.get_x()), int(slime.get_y()))
-                self.__pheromone_grid.set_slime_id(int(slime.get_x()), int(slime.get_y()), slime.get_id())
+        for slime in self.__slime_vector:
+            self.__pheromone_grid.add_slime_level(int(slime.get_x()), int(slime.get_y()))
+            self.__pheromone_grid.set_slime_id(int(slime.get_x()), int(slime.get_y()), slime.get_id())
 
-        Optim.time_exec("Slime level", slime_level_f)
-        Optim.time_exec("Update grid", self.__pheromone_grid.update)
+        self.__pheromone_grid.update()
 
     def physics(self) -> None:
-        Optim.time_exec("Move slimes", self.move_all_slime)
-        Optim.time_exec("Update pheromones", self.update_pheromones)
+        self.move_all_slime()
+        self.update_pheromones()
 
     def generate_random_slime(self, slime_count: int) -> None:
         self.__slime_vector = np.ndarray(slime_count, Slime)

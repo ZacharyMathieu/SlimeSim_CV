@@ -1,13 +1,14 @@
 import time
 
 
-def time_exec(name: str, func, print_time=False, *args):
+def time_exec(name: str, func, *args, print_time=True):
     before = time.time()
     ret = func(*args)
     after = time.time()
+    d = after - before
     if print_time:
-        print("{name}: {timer}".format(name=name, timer=after - before))
-    return ret, after - before
+        print("{name}: {timer}".format(name=name, timer=d))
+    return ret, d
 
 
 time_bank = {}
